@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workhive/features/auth/presentation/screens/login_screen.dart';
 import '../../../../core/theme/app_colors.dart';
-import 'role_selection_screen.dart';
-
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 

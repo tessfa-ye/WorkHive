@@ -1,0 +1,98 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String   // Hashed password
+  fullName        String
+  avatarUrl       String?
+  
+  // Role Flags (A user can be both)
+  isFreelancer    Boolean  @default(false)
+  isClient        Boolean  @default(false)
+  
+  // Current active mode (Used to determine UI in Flutter)
+  activeRole      Role     @default(FREELANCER)
+
+  // Profiles (One-to-One)
+  freelancerProfile FreelancerProfile?
+  clientProfile     ClientProfile?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum Role {
+  FREELANCER
+  CLIENT
+}
+
+model FreelancerProfile {
+  id           String   @id @default(uuid())
+  title        String?  // e.g., "Senior Flutter Developer"
+  bio          String?
+  hourlyRate   Float?
+  skills       String[]
+  
+  // Relation back to User
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Freelancer specific actions
+  bids         Bid[]
+}
+
+model ClientProfile {
+  id           String   @id @default(uuid())
+  companyName  String?
+  description  String?
+  website      String?
+
+  // Relation back to User
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Client specific actions
+  jobs         Job[]
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  budget      Float
+  status      JobStatus @default(OPEN)
+
+  clientId    String
+  client      ClientProfile @relation(fields: [clientId], references: [id])
+  
+  bids        Bid[]
+  createdAt   DateTime @default(now())
+}
+
+model Bid {
+  id           String   @id @default(uuid())
+  amount       Float
+  proposal     String
+  
+  freelancerId String
+  freelancer   FreelancerProfile @relation(fields: [freelancerId], references: [id])
+  
+  jobId        String
+  job          Job      @relation(fields: [jobId], references: [id])
+}
+
+enum JobStatus {
+  OPEN
+  ONGOING
+  COMPLETED
+  CANCELLED
+}

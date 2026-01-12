@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+.env
+dist/
+   
+
+# Prisma
+/prisma/migrations/
+# Note: Keep schema.prisma and prisma.config.ts, but ignore generated client if custom
+node_modules/.prisma
